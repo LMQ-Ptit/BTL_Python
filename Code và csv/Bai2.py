@@ -75,5 +75,5 @@ if __name__ == "__main__":
     df = pd.read_csv("results.csv")
     find_top_bottom_players(df)
     calculate_team_statistics(df)
-    generate_histograms(df)
+    # generate_histograms(df)
     identify_best_team(df)

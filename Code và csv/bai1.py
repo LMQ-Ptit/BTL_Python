@@ -1,286 +1,219 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import sys
-import numpy as np
 import time
 from functools import reduce
+
+def crawl_base_data(soup, team_name, base_data, ok):
+    """Hàm tìm dữ liệu base_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_standard_9'})
+    if ok == 1:
+        b = ["Team"]
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        base_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = [team_name]
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        base_data.append(tmp)
+
+def crawl_goalkeep_data(soup, team_name, goalkeep_data, ok):
+    """Hàm tìm dữ liệu goalkeep_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_keeper_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        goalkeep_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        goalkeep_data.append(tmp)
+
+def crawl_shooting_data(soup, team_name, shooting_data, ok):
+    """Hàm tìm dữ liệu shooting_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_shooting_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        shooting_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        shooting_data.append(tmp)
+
+def crawl_passing_data(soup, team_name, passing_data, ok):
+    """Hàm tìm dữ liệu passing_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_passing_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        passing_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        passing_data.append(tmp)
+
+def crawl_passtype_data(soup, team_name, passtype_data, ok):
+    """Hàm tìm dữ liệu passtype_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_passing_types_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        passtype_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        passtype_data.append(tmp)
+
+def crawl_goalshot_data(soup, team_name, goalshot_data, ok):
+    """Hàm tìm dữ liệu goalshot_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_gca_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        goalshot_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        goalshot_data.append(tmp)
+
+def crawl_defensive_data(soup, team_name, defensive_data, ok):
+    """Hàm tìm dữ liệu defensive_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_defense_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        defensive_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        defensive_data.append(tmp)
+
+def crawl_possess_data(soup, team_name, possess_data, ok):
+    """Hàm tìm dữ liệu possess_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_possession_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        possess_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        possess_data.append(tmp)
+
+def crawl_playtime_data(soup, team_name, playtime_data, ok):
+    """Hàm tìm dữ liệu playtime_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_playing_time_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        playtime_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        playtime_data.append(tmp)
+
+def crawl_miscell_data(soup, team_name, miscell_data, ok):
+    """Hàm tìm dữ liệu miscell_data của một đội bóng."""
+    table = soup.find('table', {'class': 'stats_table sortable min_width', 'id': 'stats_misc_9'})
+    if ok == 1:
+        b = []
+        thead = table.find('thead').find_all('tr')
+        for x in thead[1]:
+            if x.text.strip() != "":
+                b.append(x.text.strip())
+        miscell_data.append(b)
+    tbody = table.find('tbody').find_all('tr')
+    for y in tbody:
+        tmp = []
+        for x in y:
+            tmp.append(x.text.strip() if x.text.strip() else "N/a")
+        miscell_data.append(tmp)
+
 if __name__ == "__main__":
-    url='https://fbref.com/en/comps/9/2023-2024/2023-2024-Premier-League-Stats'
-    r=requests.get(url)
-    soup=BeautifulSoup(r.content,'html.parser')
-    table=soup.find('table',{
-        'class': 'stats_table sortable min_width force_mobilize',
-        'id': 'results2023-202491_overall'
-    })
-    #Danh sách chứa các đội bóng và url đến đội bóng đó
-    teams_data=[]
-    #Tìm các thẻ <a> trong <tbody> của table
+    url = 'https://fbref.com/en/comps/9/2023-2024/2023-2024-Premier-League-Stats'
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    table = soup.find('table', {'class': 'stats_table sortable min_width force_mobilize', 'id': 'results2023-202491_overall'})
+    
+    teams_data = []
     tbody = table.find('tbody')
     teams = tbody.find_all('a', href=True)
-    #Đưa dữ liệu về tên và link đội bóng vào danh sách
-    for team in teams :
+    
+    for team in teams:
         if "squads" in team['href']:
-            team_name=team.text.strip()
-            team_url="https://fbref.com" + team['href']
-            teams_data.append([team_name,team_url])
-    #Chuyển danh sách thành df và ghi vào file csv
-    df=pd.DataFrame(teams_data[1:],columns=teams_data[0])
+            team_name = team.text.strip()
+            team_url = "https://fbref.com" + team['href']
+            teams_data.append([team_name, team_url])
+    
+    df = pd.DataFrame(teams_data[1:], columns=teams_data[0])
     df.to_csv('team_data.csv', index=False, encoding='utf-8-sig')
-    ok=1 # Tạo 1 biến check header
-    # Tạo danh sách chữa dữ liệu của các hàng
-    base_data=[]
-    goalkeep_data=[]
-    shooting_data=[]
-    passing_data=[]
-    passtype_data=[]
-    goalshot_data=[]
-    defensive_data=[]
-    possess_data=[]
-    playtime_data=[]
-    miscell_data=[]
+
+    ok = 1
+    base_data, goalkeep_data, shooting_data, passing_data, passtype_data, goalshot_data, defensive_data, possess_data, playtime_data, miscell_data = [], [], [], [], [], [], [], [], [], []
+    
     for team in teams_data:
-        print(f"dang cao du lieu doi {team[0]}..")
-        r=requests.get(team[1])
-        soup=BeautifulSoup(r.content,'html.parser')
-
-        # Bắt đầu cào base_data
-        # Tìm bảng chứa dữ liệu
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_standard_9'
-        })
-        #Tìm tên các cột
-        if ok==1:
-            b=[]
-            b.append("Team")
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            base_data.append(b)
-        #TÌm các dữ liệu còn lại của bảng
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            tmp.append(team[0])
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            base_data.append(tmp)
-        #Mấy cái dưới tương tự , thay đổi mỗi cái id bảng 
-        #kết thúc cào base_data
-
-        # Bắt đầu cào goalkeep_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_keeper_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            goalkeep_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            goalkeep_data.append(tmp)
-        #kết thúc cào goalkeep_data
-
-        # Bắt đầu cào shooting_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_shooting_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            shooting_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            shooting_data.append(tmp)
-        #kết thúc cào shooting_data
-
-        # Bắt đầu cào passing_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_passing_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            passing_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            passing_data.append(tmp)
-        #kết thúc cào passing_data
-
-        # Bắt đầu cào passtype_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_passing_types_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            passtype_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            passtype_data.append(tmp)
-        #kết thúc cào passtype_data
-
-        # Bắt đầu cào goalshot_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_gca_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            goalshot_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            goalshot_data.append(tmp)
-        #kết thúc cào goalshot_data
-
-        # Bắt đầu cào defensive_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_defense_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            defensive_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            defensive_data.append(tmp)
-        #kết thúc cào defensive_data
-
-        # Bắt đầu cào possess_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_possession_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            possess_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            possess_data.append(tmp)
-        #kết thúc cào possess_data
-
-        # Bắt đầu cào playtime_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_playing_time_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            playtime_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            playtime_data.append(tmp)
-        #kết thúc cào playtime_data
-
-        # Bắt đầu cào miscell_data
-        table=soup.find('table',{
-            'class':'stats_table sortable min_width',
-            'id':'stats_misc_9'
-        })
-        if ok==1:
-            b=[]
-            thead=table.find('thead').find_all('tr')
-            for x in thead[1]:
-                if x.text.strip()!="":
-                    b.append(x.text.strip())
-            miscell_data.append(b)
-        tbody=table.find('tbody').find_all('tr')
-        for y in tbody:
-            tmp=[]
-            for x in y: 
-                if(x.text.strip()==""):
-                    tmp.append("N/a")
-                else :
-                    tmp.append(x.text.strip())
-            miscell_data.append(tmp)
-        #kết thúc cào miscell_data
-        print(f'da cao xong doi {team[0]}...')
-        ok+=1
+        print(f"Đang cào dữ liệu đội {team[0]}...")
+        r = requests.get(team[1])
+        soup = BeautifulSoup(r.content, 'html.parser')
+        
+        crawl_base_data(soup, team[0], base_data, ok)
+        crawl_goalkeep_data(soup, team[0], goalkeep_data, ok)
+        crawl_shooting_data(soup, team[0], shooting_data, ok)
+        crawl_passing_data(soup, team[0], passing_data, ok)
+        crawl_passtype_data(soup, team[0], passtype_data, ok)
+        crawl_goalshot_data(soup, team[0], goalshot_data, ok)
+        crawl_defensive_data(soup, team[0], defensive_data, ok)
+        crawl_possess_data(soup, team[0], possess_data, ok)
+        crawl_playtime_data(soup, team[0], playtime_data, ok)
+        crawl_miscell_data(soup, team[0], miscell_data, ok)
+        
+        print(f'Đã cào xong đội {team[0]}...')
+        ok += 1
         time.sleep(4)
     #Tạo 1 list chứa tất cả các df 
     all_df=[]
@@ -342,10 +275,3 @@ if __name__ == "__main__":
     print(result)
     #Ghi thông tin vào file csv
     # result.to_csv("results.csv",index=False)
-
-
-
-
-    
-
-    
