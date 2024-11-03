@@ -1,62 +1,73 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.pyplot as plt
 
+# Hàm vẽ biểu đồ K-means
+def plot_clusters(data_points, centroid_points, cluster_labels, num_clusters):
+    plt.figure(figsize=(8, 6))
 
-def plot_kmeans(data, centroids, clusters, step):
-        plt.figure(figsize=(8, 6))
+    # Màu sắc ngẫu nhiên cho các cụm
+    colors = plt.cm.get_cmap('viridis', num_clusters)
 
-        # Tạo màu sắc ngẫu nhiên cho các cụm
-        colors = plt.cm.get_cmap('viridis', k)  # Sử dụng colormap 'viridis' với k màu
+    for cluster_index in range(num_clusters):
+        # Lấy các điểm thuộc cụm cluster_index
+        cluster_points = data_points[cluster_labels == cluster_index]
+        plt.scatter(cluster_points[:, 0], cluster_points[:, 1], s=50, color=colors(cluster_index), label=f'Cụm {cluster_index}')
+        # Vẽ tâm cụm
+        plt.scatter(centroid_points[cluster_index, 0], centroid_points[cluster_index, 1], s=200, color=colors(cluster_index), marker='X', edgecolor='k')
 
-        # Vẽ các điểm dữ liệu theo cụm
-        for i in range(k):
-            points = data[clusters == i]
-            plt.scatter(points[:, 0], points[:, 1], s=50, color=colors(i), label=f'Cluster {i}')
-            plt.scatter(centroids[i, 0], centroids[i, 1], s=200, color=colors(i), marker='X', edgecolor='k')
+    plt.title('K-means Phân cụm các cầu thủ bóng đá')
+    plt.xlabel('PC1')
+    plt.ylabel('PC2')
+    plt.legend()
+    plt.show()
 
-        plt.title('K-means Clustering of Football Players')
-        plt.xlabel('PC1')
-        plt.ylabel('PC2')
-        plt.legend()
-        plt.show()
-
-
-if __name__ == "__main__":
-    # Đọc file csv
-    data = pd.read_csv('results.csv')
-    # Loại bỏ các cột  ở dạng chuỗi
-    data = data.select_dtypes(exclude=['object'])
-    # Điền các ô N/a bằng trung bình của cột đó
-    data = data.fillna(data.mean())
+# Hàm chuẩn bị dữ liệu
+def prepare_data(file_path):
+    # Đọc dữ liệu và xử lý giá trị thiếu
+    data_frame = pd.read_csv(file_path)
+    data_frame = data_frame.select_dtypes(exclude=['object'])
+    data_frame.fillna(data_frame.mean(), inplace=True)
+    
     # Chuẩn hóa dữ liệu
-    scaler_standard = StandardScaler() # Khởi tạo
-    data = pd.DataFrame(scaler_standard.fit_transform(data), columns=data.columns)
-    # Áp dụng PCA giảm số chiều xuống 2
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data_frame)
+
+    # Giảm chiều với PCA
     pca = PCA(n_components=2)
-    data = pca.fit_transform(data)
-    data = pd.DataFrame(data, columns=['PC1', 'PC2'])
-    # Số lượng cụm lấy ngẫu nhiên
-    k = 5
-    # Khởi tạo ngẫu nhiên các tâm cụm
-    centroids = data.sample(n=k).values
-    # Khởi tạo nhãn cho các điểm dữ liệu
-    clusters = np.zeros(data.shape[0])
-    epochs = 100
-    for step in range(epochs):  # Giới hạn số bước lặp
-        # Bước 1: Gán nhãn dựa trên khoảng cách đến các tâm cụm
-        for i in range(len(data)):
-            distances = np.linalg.norm(data.values[i] - centroids, axis=1)
-            clusters[i] = np.argmin(distances)
-        # Bước 2: Cập nhật các tâm cụm
-        new_centroids = np.array([data.values[clusters == j].mean(axis=0) for j in range(k)])
-        # Kiểm tra nếu các tâm cụm không thay đổi thì kết thúc
-        if np.all(centroids == new_centroids):
-             # Vẽ biểu đồ
-            plot_kmeans(data.values, centroids, clusters, step)
+    reduced_data = pca.fit_transform(standardized_data)
+
+    return pd.DataFrame(reduced_data, columns=['PC1', 'PC2'])
+
+# Hàm chạy K-means tùy chỉnh
+def kmeans_custom(data_frame, num_clusters, max_iterations=100):
+    # Khởi tạo tâm cụm ngẫu nhiên
+    centroid_points = data_frame.sample(n=num_clusters).values
+    cluster_labels = np.zeros(len(data_frame))
+
+    for _ in range(max_iterations):
+        # Gán nhãn cụm cho từng điểm
+        for point_index in range(len(data_frame)):
+            distances = np.linalg.norm(data_frame.values[point_index] - centroid_points, axis=1)
+            cluster_labels[point_index] = np.argmin(distances)
+        
+        # Cập nhật tâm cụm mới
+        new_centroid_points = np.array([data_frame.values[cluster_labels == cluster_index].mean(axis=0) for cluster_index in range(num_clusters)])
+        
+        # Kiểm tra sự hội tụ
+        if np.all(centroid_points == new_centroid_points):
             break
-        centroids = new_centroids
+        
+        centroid_points = new_centroid_points
+
+    # Vẽ biểu đồ kết quả cuối cùng
+    plot_clusters(data_frame.values, centroid_points, cluster_labels, num_clusters)
+
+# Chạy chương trình chính
+if __name__ == "__main__":
+    file_path = 'results.csv'
+    prepared_data = prepare_data(file_path)
+    num_clusters = 5  # Số cụm mong muốn
+    kmeans_custom(prepared_data, num_clusters)
